@@ -4,9 +4,9 @@ internal class Day1
     public static void Run()
     {
         var input1 = File.ReadAllLines("Day1/input.txt");
-        var input2 = File.ReadAllLines("Day1/input.txt");
-
         System.Console.WriteLine($"part 1: {Part1(input1)}");
+
+        var input2 = File.ReadAllLines("Day1/input.txt");
         System.Console.WriteLine($"part 2: {Part2(input2)}");
     }
 
@@ -19,6 +19,7 @@ internal class Day1
             var lineNumbers = line.Where(c => char.IsDigit(c));
             result += int.Parse($"{lineNumbers.First()}{lineNumbers.Last()}");
         }
+        
         return result;
     }
 
@@ -40,6 +41,7 @@ internal class Day1
             }
             result += int.Parse($"{lineNumbers.First()}{lineNumbers.Last()}");
         }
+
         return result;
     }
 
@@ -67,6 +69,4 @@ internal class Day1
 
         return null;
     }
-
-
 }
