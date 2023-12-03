@@ -1,5 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
-
 internal class Day2
 {
     public static void Run()
