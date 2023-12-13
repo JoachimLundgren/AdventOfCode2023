@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 AdventOfCode/AdventOfCode/.DS_Store
+AdventOfCode/.vscode/settings.json
