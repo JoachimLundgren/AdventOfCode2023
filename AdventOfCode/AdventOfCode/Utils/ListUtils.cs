@@ -8,6 +8,31 @@ public static class ListUtils
         }
     }
 
+    public static T[][] Copy<T>(T[][] matrix)
+    {
+        return matrix.Select(m => m.ToArray()).ToArray();
+    }
+
+    public static T[][] Transpose<T>(T[][] matrix)
+    {
+        var rows = matrix.Length;
+        var columns = matrix[0].Length;
+
+        var result = new T[columns][];
+
+        for (var c = 0; c < columns; c++)
+        {
+            var row = new T[rows];
+            for (var r = 0; r < rows; r++)
+            {
+                row[r] = matrix[r][c];
+            }
+            result[c] = row;
+        }
+
+        return result;
+    }
+
     public static List<Coordinate> GetCoordinates<T>(IEnumerable<IEnumerable<T>> matrix, T obj)
     {
         var res = new List<Coordinate>();
