@@ -33,6 +33,12 @@ public static class ListUtils
         return result;
     }
 
+    public static T[][] Rotate<T>(T[][] matrix)
+    {
+        var res = Transpose(matrix);
+        return res.Select(r => r.Reverse().ToArray()).ToArray();
+    }
+
     public static List<Coordinate> GetCoordinates<T>(IEnumerable<IEnumerable<T>> matrix, T obj)
     {
         var res = new List<Coordinate>();
