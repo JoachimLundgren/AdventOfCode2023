@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using AdventOfCode;
+
 
 internal class Day4
 {

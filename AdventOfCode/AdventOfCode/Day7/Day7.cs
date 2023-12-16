@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
 using AdventOfCode;
 
 internal class Day7

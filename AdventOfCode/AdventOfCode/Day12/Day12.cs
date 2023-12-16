@@ -1,7 +1,4 @@
 using System.Data;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-
 internal class Day12
 {
     public static void Run()
