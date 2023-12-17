@@ -1,88 +1,101 @@
-using System.Data;
+using AdventOfCode;
 internal class Day12
 {
     public static void Run()
     {
-        var input = ParseInput("Day12/input.txt");
-        //System.Console.WriteLine(Part1(input));
-        System.Console.WriteLine(Part2(input));
+        Ensure.Solve("Part 1 testinput", () => Part1(ParseInput("Day12/testinput.txt")), 21, runs: 10);
+        Ensure.Solve("Part 1", () => Part1(ParseInput("Day12/input.txt")), 7599, runs: 10);  //653ms
+        Ensure.Solve("Part 2 testinput", () => Part2(ParseInput("Day12/testinput.txt")), 525152, runs: 10); //8865ms
+        Ensure.Solve("Part 2", () => Part2(ParseInput("Day12/input.txt")), 15454556629917, runs: 10); //4558ms
     }
-    
+
     private static List<Record> ParseInput(string fileName)
     {
         var lines = File.ReadAllLines(fileName);
         return lines.Select(line => new Record(line)).ToList();
     }
 
-    private static long Part1(List<Record> lines)
+    private static long Part1(List<Record> records)
     {
-        return lines.Sum(l => GetArrangements(l.Row, l.Sizes));
+        return records.Sum(r => r.Count2());
     }
 
     private static long Part2(List<Record> lines)
     {
-        //Naive and takes to long time.
         lines.ForEach(l => l.Unfold());
         return Part1(lines);
     }
 
-    private static long GetArrangements(List<char> row, List<int> sizes)
-    {
-        var res = GetCount(true, row, sizes);
-        System.Console.WriteLine(new string(row.ToArray()) + res);
-        return res;
-    }
-
-    private static int GetCount(bool canDoBracket, List<char> row, List<int> sizes)
-    {
-        if (!row.SkipWhile(c => c == '.' || c == '?').Any() && !sizes.Any())
-        {
-            return 1;
-        }
-        else if (!row.SkipWhile(c => c == '.').Any() || !sizes.Any())
-        {
-            return 0;
-        }
-
-        var first = row.First();
-        if (first == '#')
-        {
-            var count = sizes.First();
-            if (canDoBracket && row.TakeWhile(c => c == '#' || c == '?').Count() >= count)
-            {
-                return GetCount(false, row.Skip(count).ToList(), sizes.Skip(1).ToList());
-            }
-            return 0;
-        }
-        else if (first == '.')
-        {
-            return GetCount(true, row.Skip(1).ToList(), sizes);
-        }
-        else if (first == '?')
-        {
-            return GetCount(canDoBracket, row.Skip(1).Prepend('.').ToList(), sizes)
-                 + GetCount(canDoBracket, row.Skip(1).Prepend('#').ToList(), sizes);
-        }
-
-        throw new ApplicationException("Unknown first character");
-    }
-
     private class Record
     {
-        public List<char> Row { get;set;}
-        public List<int> Sizes {get;set;}
-
+        public char[] Row { get; set; }
+        public int[] Sizes { get; set; }
         public Record(string line)
         {
             var l = line.Split(' ');
-            Row = l[0].ToCharArray().ToList();
-            Sizes = l[1].Split(',').Select(n => int.Parse(n)).ToList();
+            Row = l[0].ToCharArray();
+            Sizes = l[1].Split(',').Select(n => int.Parse(n)).ToArray();
         }
 
         public void Unfold()
         {
-            Row = Row.Append('?').Concat(Row).Append('?').Concat(Row).Append('?').Concat(Row).Append('?').Concat(Row).ToList();
-            Sizes = Sizes.Concat(Sizes).Concat(Sizes).Concat(Sizes).Concat(Sizes).ToList();
+            Row = [.. Row, '?', .. Row, '?', .. Row, '?', .. Row, '?', .. Row];
+            Sizes = [.. Sizes, .. Sizes, .. Sizes, .. Sizes, .. Sizes];
+        }
+
+        public long Count2()
+        {
+            var impl = CacheUtils.Memoized<(bool, int, int), long>((cnt, input) =>
+            {
+                var canDoBracket = input.Item1;
+                var rowStart = input.Item2;
+                var sizesStart = input.Item3;
+
+                if (rowStart >= Row.Count())
+                {
+                    return Sizes.Skip(sizesStart).All(c => c == '#' || c == '?') ? 1 : 0;
+                }
+
+                var first = Row[rowStart];
+                if (first == '#')
+                {
+                    if (sizesStart < Sizes.Count())
+                    {
+                        var count = Sizes[sizesStart];
+                        if (canDoBracket && Row.Skip(rowStart).TakeWhile(c => c == '#' || c == '?').Count() >= count)
+                        {
+                            return cnt((false, rowStart + count, sizesStart + 1));
+                        }
+
+                    }
+                    return 0;
+                }
+                else if (first == '.')
+                {
+                    return cnt((true, rowStart + 1, sizesStart));
+                }
+                else if (first == '?')
+                {
+                    var res = cnt((true, rowStart + 1, sizesStart));    //.
+                    if (canDoBracket)
+                    {
+                        if (sizesStart < Sizes.Count())
+                        {
+                            var count = Sizes[sizesStart];
+                            if (Row.Skip(rowStart).TakeWhile(c => c == '#' || c == '?').Count() >= count)
+                            {
+                                res += cnt((false, rowStart + count, sizesStart + 1));
+                            }
+                        }
+                    }
+
+                    return res;
+                }
+
+                throw new ApplicationException("Unknown first character");
+            });
+
+            return impl((true, 0, 0));
         }
     }
 }
