@@ -39,6 +39,11 @@ public static class ListUtils
         return res.Select(r => r.Reverse().ToArray()).ToArray();
     }
 
+    public static long Count<T>(IEnumerable<IEnumerable<T>> matrix, T obj)
+    {
+        return matrix.Sum(line => line.LongCount(l => l != null && l.Equals(obj)));
+    }
+
     public static List<Coordinate> GetCoordinates<T>(IEnumerable<IEnumerable<T>> matrix, T obj)
     {
         var res = new List<Coordinate>();
