@@ -10,19 +10,23 @@ public static class ArrayExtensions
             && column < matrix[row].Length;
     }
 
-    public static List<(int row, int column)> GetAdjecant<T>(this T[][] matrix, int row, int column)
+    public static List<(int row, int column)> GetAdjecant<T>(this T[][] matrix, int row, int column, bool diagonal = true)
     {
         var adjacent = new List<(int row, int column)>()
         {
-            (row - 1, column - 1),
             (row - 1, column),
-            (row - 1, column + 1),
             (row, column - 1),
             (row, column + 1),
-            (row + 1, column - 1),
             (row + 1, column),
-            (row + 1, column + 1)
         };
+
+        if (diagonal)
+        {
+            adjacent.Add((row - 1, column - 1));
+            adjacent.Add((row - 1, column + 1));
+            adjacent.Add((row + 1, column - 1));
+            adjacent.Add((row + 1, column + 1));
+        }
 
         return adjacent
             .Where(c => matrix.IsInside(c.row, c.column))
